@@ -1,4 +1,5 @@
 import cloudinary
+import cloudinary.uploader
 import os
 from dotenv import load_dotenv
 import time
@@ -36,4 +37,44 @@ def generate_upload_signature():
         "timestamp": timestamp,
         "cloudName": cloudinary.config().cloud_name,
         "apiKey": cloudinary.config().api_key
-    } 
+    }
+
+def upload_image(file, folder="event_posters"):
+    """
+    Upload an image directly to Cloudinary from the backend
+    
+    Args:
+        file: UploadFile from FastAPI
+        folder: Cloudinary folder where the image should be stored
+        
+    Returns:
+        dict: Contains the image URL and other upload information
+    """
+    try:
+        # Read the file content
+        file_content = file.file.read()
+        
+        # Upload to Cloudinary
+        result = cloudinary.uploader.upload(
+            file_content,
+            folder=folder,
+            resource_type="image"
+        )
+        
+        # Return the upload result (contains secure_url, public_id, etc.)
+        return {
+            "success": True,
+            "url": result["secure_url"],
+            "public_id": result["public_id"],
+            "format": result["format"],
+            "width": result["width"],
+            "height": result["height"]
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+    finally:
+        # Reset file cursor to beginning
+        file.file.seek(0) 

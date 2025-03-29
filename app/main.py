@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -45,4 +45,27 @@ async def health_check():
 @app.get("/cloudinary/signature")
 async def get_cloudinary_signature(_: bool = Depends(verify_admin)):
     """Get signature for direct uploads to Cloudinary"""
-    return cloudinary_setup.generate_upload_signature() 
+    return cloudinary_setup.generate_upload_signature()
+
+@app.post("/upload/image")
+async def upload_image(file: UploadFile = File(...), _: bool = Depends(verify_admin)):
+    """
+    Upload an image directly through the backend
+    
+    This endpoint handles the full image upload process to Cloudinary,
+    bypassing the need for frontend signature handling.
+    """
+    if not file:
+        raise HTTPException(status_code=400, detail="No file provided")
+    
+    # Check if the file is an image
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+    
+    # Upload image to Cloudinary
+    result = cloudinary_setup.upload_image(file)
+    
+    if not result["success"]:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {result.get('error', 'Unknown error')}")
+    
+    return result 
