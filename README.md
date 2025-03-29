@@ -109,6 +109,49 @@ The application uses Cloudinary for image hosting with the following credentials
 
 For uploading images through the frontend, you can use Cloudinary's upload widget or direct upload functionality. The backend will only store the URL of the image.
 
+## Deploying to Render with Persistent Disk
+
+This project can be deployed to Render with a persistent disk to preserve data across deployments.
+
+### Setup
+
+1. Create a new Web Service on Render
+2. Connect your GitHub repository
+3. Configure the service with these settings:
+   - **Name**: azulucrm (or your preferred name)
+   - **Runtime**: Python
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn run:app --host 0.0.0.0 --port $PORT`
+
+4. Add the following environment variables:
+   - `ADMIN_PASSWORD`: Your admin password
+   - `CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name
+   - `CLOUDINARY_API_KEY`: Your Cloudinary API key
+   - `CLOUDINARY_API_SECRET`: Your Cloudinary API secret
+   - `RENDER_DISK_PATH`: `/var/data`
+
+5. Add a persistent disk:
+   - **Mount Path**: `/var/data`
+   - **Size**: 1 GB (or adjust as needed)
+
+### Using the render.yaml file
+
+Alternatively, you can use the included `render.yaml` file for deployment using Render Blueprints:
+
+1. Push the `render.yaml` file to your GitHub repository
+2. Go to the Render Dashboard → Blueprints → New Blueprint Instance
+3. Connect your GitHub repository
+4. Configure the environment variables that are marked with `sync: false` in the Blueprint
+
+### Data Migration
+
+To migrate your existing SQLite database to Render:
+
+1. Deploy the service first
+2. Use the Render shell to access your service
+3. Create the data directory: `mkdir -p /var/data`
+4. Upload your existing database to the persistent disk using SFTP or the Render shell
+
 ## License
 
 MIT 

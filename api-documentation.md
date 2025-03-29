@@ -132,6 +132,23 @@ X-Admin-Password: your_admin_password
     - `cloudName`: Cloudinary cloud name
     - `apiKey`: Cloudinary API key
 
+#### Direct Image Upload
+
+- **POST /upload/image** - Upload an image directly through the backend
+  - Authentication Required: Yes
+  - Request: Multipart form data with an image file
+  - Request Format: `multipart/form-data`
+  - Response: JSON object with the following fields:
+    - `success`: Boolean indicating if the upload was successful
+    - `url`: The Cloudinary URL of the uploaded image
+    - `public_id`: The Cloudinary public ID of the image
+    - `format`: The image format
+    - `width`: The image width
+    - `height`: The image height
+  - Status Codes:
+    - 400: No file provided or file is not an image
+    - 500: Upload failed (with error details)
+
 ## Data Models
 
 ### Event
@@ -317,33 +334,19 @@ function LoginForm({ onLoginSuccess }) {
 export default LoginForm;
 ```
 
-### Image Upload Implementation with Cloudinary
+### Image Upload Implementation
 
-The API uses Cloudinary for image storage. Here's how to implement image uploads:
+There are two ways to upload images to the Azulu CRM system:
 
-1. **Get Cloudinary Upload Signature:**
+#### Method 1: Direct Backend Upload (Recommended)
 
-```javascript
-import { fetchWithAuth } from './api';
-
-export const getCloudinarySignature = async () => {
-  const response = await fetchWithAuth('/cloudinary/signature');
-  
-  if (!response.ok) {
-    throw new Error('Failed to get Cloudinary upload signature');
-  }
-  
-  return response.json();
-};
-```
-
-2. **Create an Image Upload Component:**
+Using the new `/upload/image` endpoint is simpler and more reliable as it handles all Cloudinary interactions on the server:
 
 ```jsx
-import React, { useState, useEffect } from 'react';
-import { getCloudinarySignature } from './api';
+import React, { useState } from 'react';
+import { fetchWithAuth } from './api';
 
-function ImageUploader({ onUploadSuccess }) {
+function DirectImageUploader({ onUploadSuccess }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -363,38 +366,35 @@ function ImageUploader({ onUploadSuccess }) {
 
     try {
       setIsUploading(true);
-      setUploadStatus('Getting upload signature...');
+      setUploadStatus('Uploading image...');
       
-      // Step 1: Get the signature from our backend
-      const signature = await getCloudinarySignature();
-      
-      // Step 2: Create FormData with all necessary parameters
+      // Create form data
       const formData = new FormData();
       formData.append('file', selectedFile);
-      formData.append('api_key', signature.apiKey);
-      formData.append('timestamp', signature.timestamp);
-      formData.append('signature', signature.signature);
-      // Optional: add a folder and file naming convention
-      formData.append('folder', 'event_posters');
       
-      // Step 3: Upload directly to Cloudinary
-      setUploadStatus('Uploading to Cloudinary...');
-      const uploadResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/${signature.cloudName}/image/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-
-      const uploadResult = await uploadResponse.json();
+      // Upload to backend endpoint
+      const response = await fetchWithAuth('/upload/image', {
+        method: 'POST',
+        headers: {
+          // Don't set Content-Type here - it will be set automatically with the boundary
+          'X-Admin-Password': sessionStorage.getItem('adminPassword')
+        },
+        body: formData
+      });
       
-      if (uploadResponse.ok) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Upload failed');
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
         setUploadStatus('Upload successful!');
-        // Pass the Cloudinary URL to the parent component
-        onUploadSuccess(uploadResult.secure_url);
+        // Pass the image URL to the parent component
+        onUploadSuccess(result.url);
       } else {
-        setUploadStatus(`Upload failed: ${uploadResult.error?.message || 'Unknown error'}`);
+        setUploadStatus(`Upload failed: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       setUploadStatus(`Error: ${error.message}`);
@@ -422,15 +422,33 @@ function ImageUploader({ onUploadSuccess }) {
   );
 }
 
-export default ImageUploader;
+export default DirectImageUploader;
 ```
 
-3. **Using the Image Uploader in an Event Form:**
+#### Method 2: Cloudinary Signature Approach (Alternative)
+
+If you prefer to upload directly to Cloudinary from the frontend:
+
+```javascript
+import { fetchWithAuth } from './api';
+
+export const getCloudinarySignature = async () => {
+  const response = await fetchWithAuth('/cloudinary/signature');
+  
+  if (!response.ok) {
+    throw new Error('Failed to get Cloudinary upload signature');
+  }
+  
+  return response.json();
+};
+```
+
+### Using the Image Uploader in an Event Form
 
 ```jsx
 import React, { useState } from 'react';
 import { fetchWithAuth } from './api';
-import ImageUploader from './ImageUploader';
+import DirectImageUploader from './DirectImageUploader';
 
 function EventForm() {
   const [eventData, setEventData] = useState({
@@ -515,7 +533,7 @@ function EventForm() {
             </button>
           </div>
         ) : (
-          <ImageUploader onUploadSuccess={handleImageUploaded} />
+          <DirectImageUploader onUploadSuccess={handleImageUploaded} />
         )}
       </div>
       

@@ -4,7 +4,13 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # Get the database file path from environment variable or use default
+# For Render deployment with persistent disk
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./azulu.db")
+
+# If using Render with persistent disk, construct the path
+RENDER_DISK_PATH = os.getenv("RENDER_DISK_PATH")
+if RENDER_DISK_PATH:
+    DATABASE_URL = f"sqlite:///{RENDER_DISK_PATH}/azulu.db"
 
 # Create SQLAlchemy engine
 engine = create_engine(
