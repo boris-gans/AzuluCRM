@@ -1,6 +1,7 @@
 import uvicorn
 import os
 from dotenv import load_dotenv
+from app.main import app  # Import the app object from app.main
 
 # Load environment variables
 load_dotenv()
