@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 
 from . import models, database, cloudinary_setup
-from .routers import events, content
+from .routers import events, content, mailing_list
 from .dependencies import verify_admin
 
 # Load environment variables
@@ -32,6 +32,7 @@ app.add_middleware(
 # Include routers
 app.include_router(events.router)
 app.include_router(content.router)
+app.include_router(mailing_list.router)
 
 @app.get("/")
 async def root():

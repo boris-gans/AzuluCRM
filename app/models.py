@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float, Text
+from sqlalchemy import Column, Integer, String, DateTime, Float, Text, Boolean
 from sqlalchemy.types import TypeDecorator
 import json
 from .database import Base
+from datetime import datetime
 
 class JSONList(TypeDecorator):
     """Custom type for storing lists as JSON strings"""
@@ -41,4 +42,13 @@ class Content(Base):
     id = Column(Integer, primary_key=True, index=True)
     key = Column(String, unique=True, index=True)
     string_collection = Column(JSONList, default=[])
-    big_string = Column(Text, nullable=True) 
+    big_string = Column(Text, nullable=True)
+
+class MailingListEntry(Base):
+    __tablename__ = "mailing_list"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    email = Column(String, unique=True, index=True)  # Ensure emails are unique
+    created_at = Column(DateTime, default=datetime.utcnow)
+    subscribed = Column(Boolean, default=True)  # To allow users to unsubscribe 

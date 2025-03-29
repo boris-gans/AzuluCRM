@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 from datetime import datetime
 
@@ -55,6 +55,26 @@ class ContentUpdate(BaseModel):
 
 class Content(ContentBase):
     id: int
+
+    class Config:
+        orm_mode = True
+
+class MailingListEntryBase(BaseModel):
+    name: str
+    email: EmailStr
+
+class MailingListEntryCreate(MailingListEntryBase):
+    pass
+
+class MailingListEntryUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    subscribed: Optional[bool] = None
+
+class MailingListEntry(MailingListEntryBase):
+    id: int
+    created_at: datetime
+    subscribed: bool
 
     class Config:
         orm_mode = True 
