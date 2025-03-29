@@ -1,0 +1,30 @@
+app = "azulu-crm"
+primary_region = "sjc" # Change this to your preferred region
+
+[build]
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[mounts]
+  source = "azulu_db"
+  destination = "/data"
+
+[env]
+  DATABASE_URL = "sqlite:////data/azulu.db"
+  CLOUDINARY_CLOUD_NAME = "dsjkhhpbl"
+  CLOUDINARY_API_KEY = "519823698438478"
+  CLOUDINARY_API_SECRET = "p4Vmj0mNDgU-64MHs1gB9hRzSJY"
+
+[services.concurrency]
+  hard_limit = 25
+  soft_limit = 20
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1 
