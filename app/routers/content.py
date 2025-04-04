@@ -31,6 +31,7 @@ async def create_content(
     db.add(db_content)
     db.commit()
     db.refresh(db_content)
+    print(f"Db_content: {db_content}")
     return db_content
 
 @router.get("/", response_model=List[schemas.Content])
