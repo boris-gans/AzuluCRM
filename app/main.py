@@ -7,6 +7,7 @@ from . import models, database, cloudinary_setup
 from .routers import events, content, mailing_list
 from .dependencies import verify_admin
 
+
 # Load environment variables
 load_dotenv()
 
