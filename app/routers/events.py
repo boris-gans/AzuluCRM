@@ -44,10 +44,14 @@ async def read_events(
     db: Session = Depends(database.get_db)
 ):
     query = db.query(models.Event)
-    
+
     if upcoming:
         now = datetime.now()
         query = query.filter(models.Event.start_time >= now)
+    else:
+        now = datetime.now()
+        query = query.filter(models.Event.start_time < now)
+
     
     return query.order_by(models.Event.start_time).offset(skip).limit(limit).all()
 

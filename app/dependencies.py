@@ -9,7 +9,7 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
 
 async def verify_admin(x_admin_password: Optional[str] = Header(None)) -> bool:
     """Verify that the admin password header matches the expected value"""
-    print(f"Provided: {x_admin_password}, env: {ADMIN_PASSWORD}")
+    # print(f"Provided: {x_admin_password}, env: {ADMIN_PASSWORD}")
     if not x_admin_password or x_admin_password != ADMIN_PASSWORD:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
