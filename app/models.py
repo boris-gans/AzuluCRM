@@ -25,8 +25,10 @@ class Event(Base):
     name = Column(String, index=True)
     venue_name = Column(String)
     address = Column(String)
-    start_time = Column(DateTime)
-    end_time = Column(DateTime)
+    start_date = Column(DateTime)  # Stores date portion only in UTC
+    start_time = Column(String)  # Format: "HH:MM" in local time
+    end_time = Column(String)  # Format: "HH:MM" in local time
+    time_zone = Column(String)  # IANA time zone name
     ticket_status = Column(String)  # "Available", "Sold Out", "Sold At The Door"
     ticket_link = Column(String, nullable=True)
     lineup = Column(JSONList, default=[])

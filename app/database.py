@@ -3,19 +3,18 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-# Get the database file path from environment variable or use default
-# For Render deployment with persistent disk
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./azulu.db")
+# MySQL connection details
+MYSQL_HOST = os.getenv("MYSQL_HOST", "")
+MYSQL_PORT = os.getenv("MYSQL_PORT", "")
+MYSQL_USER = os.getenv("MYSQL_USER", "")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "")
 
-# If using Render with persistent disk, construct the path
-RENDER_DISK_PATH = os.getenv("RENDER_DISK_PATH")
-if RENDER_DISK_PATH:
-    DATABASE_URL = f"sqlite:///{RENDER_DISK_PATH}/azulu.db"
+# Construct MySQL connection URL
+DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
-# Create SQLAlchemy engine
-engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}
-)
+# Create SQLAlchemy engine - no need for the SQLite-specific connect_args
+engine = create_engine(DATABASE_URL)
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

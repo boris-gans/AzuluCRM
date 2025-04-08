@@ -6,8 +6,10 @@ class EventBase(BaseModel):
     name: str
     venue_name: str
     address: str
-    start_time: datetime
-    end_time: datetime
+    start_date: datetime
+    start_time: str = Field(..., description="Time in format 'HH:MM'")
+    end_time: str = Field(..., description="Time in format 'HH:MM'")
+    time_zone: str = Field(..., description="IANA time zone name (e.g., 'America/New_York')")
     ticket_status: str = Field(..., description="Available, Sold Out, or Sold At The Door")
     ticket_link: Optional[str] = None
     lineup: List[str] = []
@@ -24,8 +26,10 @@ class EventUpdate(EventBase):
     name: Optional[str] = None
     venue_name: Optional[str] = None
     address: Optional[str] = None
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    start_date: Optional[datetime] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    time_zone: Optional[str] = None
     ticket_status: Optional[str] = None
     ticket_link: Optional[str] = None
     lineup: Optional[List[str]] = None

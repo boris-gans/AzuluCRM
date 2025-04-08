@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import Date
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, date
+import pytz
 
 from .. import models, schemas, database, dependencies
 
@@ -16,12 +18,15 @@ async def create_event(
     db: Session = Depends(database.get_db),
     _: bool = Depends(dependencies.verify_admin)
 ):
+    # Only store the date portion in UTC
     db_event = models.Event(
         name=event.name,
         venue_name=event.venue_name,
         address=event.address,
+        start_date=event.start_date,
         start_time=event.start_time,
         end_time=event.end_time,
+        time_zone=event.time_zone,
         ticket_status=event.ticket_status,
         ticket_link=event.ticket_link,
         lineup=event.lineup,
@@ -46,14 +51,14 @@ async def read_events(
     query = db.query(models.Event)
 
     if upcoming:
-        now = datetime.now()
-        query = query.filter(models.Event.start_time >= now)
+        # Compare only the date portion for upcoming events
+        today_utc = datetime.now(pytz.UTC).date()
+        query = query.filter(models.Event.start_date >= today_utc)
     else:
-        now = datetime.now()
-        query = query.filter(models.Event.start_time < now)
-
+        today_utc = datetime.now(pytz.UTC).date()
+        query = query.filter(models.Event.start_date < today_utc)
     
-    return query.order_by(models.Event.start_time).offset(skip).limit(limit).all()
+    return query.order_by(models.Event.start_date).offset(skip).limit(limit).all()
 
 @router.get("/{event_id}", response_model=schemas.Event)
 async def read_event(event_id: int, db: Session = Depends(database.get_db)):
