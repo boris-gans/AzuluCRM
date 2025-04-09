@@ -1,0 +1,17 @@
+{
+    "name": "testing",
+    "venue_name": "goya",
+    "address": "calle de atocha, 15, madrid, madrid",
+    "start_date": "2025-04-15",
+    "start_time": "23:00",
+    "end_time": "04:00",
+    "time_zone": "Europe/Amsterdam",
+    "ticket_status": "Available",
+    "ticket_link": "https://google.com",
+    "lineup": ["Benja (NL)", "overmono"],
+    "genres": ["afrohouse", "deephouse"],
+    "description": "gonna be dope",
+    "poster_url": "https://google.com",
+    "price": 100,
+    "currency": "USD"
+  }

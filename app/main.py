@@ -2,17 +2,18 @@ from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
+import logging
 
 from . import models, database, cloudinary_setup
 from .routers import events, content, mailing_list
 from .dependencies import verify_admin
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
-
-# Create database tables
-models.Base.metadata.create_all(bind=database.engine)
 
 # Create FastAPI app
 app = FastAPI(
@@ -34,6 +35,17 @@ app.add_middleware(
 app.include_router(events.router)
 app.include_router(content.router)
 app.include_router(mailing_list.router)
+
+# Startup and shutdown events
+@app.on_event("startup")
+async def startup_db_client():
+    """Verify database connection on startup"""
+    try:
+        database.verify_database_connection()
+        logger.info("Database connection verified successfully")
+    except Exception as e:
+        logger.error(f"Failed to connect to database: {str(e)}")
+        # We don't raise here to allow the app to start even if DB is temporarily down
 
 @app.get("/")
 async def root():

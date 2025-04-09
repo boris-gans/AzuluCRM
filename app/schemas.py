@@ -3,21 +3,21 @@ from typing import List, Optional
 from datetime import datetime
 
 class EventBase(BaseModel):
-    name: str
-    venue_name: str
-    address: str
-    start_date: datetime
+    name: str = Field(..., description="Name of the event")
+    venue_name: str = Field(..., description="Name of the venue")
+    address: str = Field(..., description="Address of the venue")
+    start_date: datetime = Field(..., description="Start date of the event")
     start_time: str = Field(..., description="Time in format 'HH:MM'")
     end_time: str = Field(..., description="Time in format 'HH:MM'")
     time_zone: str = Field(..., description="IANA time zone name (e.g., 'America/New_York')")
     ticket_status: str = Field(..., description="Available, Sold Out, or Sold At The Door")
-    ticket_link: Optional[str] = None
-    lineup: List[str] = []
-    genres: List[str] = []
-    description: str
-    poster_url: Optional[str] = None
-    price: Optional[float] = None
-    currency: str = "USD"
+    ticket_link: Optional[str] = Field(None, description="Link to the ticket page")
+    lineup: List[str] = Field(..., description="List of artists performing")
+    genres: List[str] = Field(..., description="List of genres")
+    description: str = Field(..., description="Description of the event")
+    poster_url: Optional[str] = Field(None, description="URL of the event poster")
+    price: Optional[float] = Field(None, description="Price of the event")
+    currency: str = Field(..., description="Currency of the event")
 
 class EventCreate(EventBase):
     pass
@@ -40,7 +40,7 @@ class EventUpdate(EventBase):
     currency: Optional[str] = None
 
 class Event(EventBase):
-    id: int
+    id: int = Field(..., description="Unique identifier for the event")
 
     class Config:
         orm_mode = True
