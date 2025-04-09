@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 # MySQL connection details
 MYSQL_HOST = os.getenv("MYSQL_HOST", "")
-MYSQL_PORT = os.getenv("MYSQL_PORT", "3306")
+MYSQL_PORT = os.getenv("MYSQL_PORT", "")
 MYSQL_USER = os.getenv("MYSQL_USER", "")  # Default user, change as needed
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")  # Set your password through env variable
-MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "aulu")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "")
 
 # Retry configuration
 MAX_RETRIES = 3
@@ -88,7 +88,7 @@ def verify_database_connection() -> bool:
     try:
         # Try to connect and execute a simple query
         with engine.connect() as connection:
-            connection.execute(text("SHOW TABLES"))
+            connection.execute(text("SELECT 1"))
         logger.info("Database connection established successfully")
         return True
     except exc.OperationalError as e:
