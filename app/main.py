@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import logging
 
 from . import models, database, cloudinary_setup
-from .routers import events, content, mailing_list
+from .routers import events, content, mailing_list, djs
 from .dependencies import verify_admin
 
 # Configure logging
@@ -35,6 +35,8 @@ app.add_middleware(
 app.include_router(events.router)
 app.include_router(content.router)
 app.include_router(mailing_list.router)
+app.include_router(djs.router)
+
 
 # Startup and shutdown events
 @app.on_event("startup")

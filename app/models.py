@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float, Text, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Float, Text, Boolean, ForeignKey
 from sqlalchemy.types import TypeDecorator
+from sqlalchemy.orm import relationship
 import json
 from .database import Base
 from datetime import datetime
@@ -54,3 +55,26 @@ class MailingListEntry(Base):
     email = Column(String(255), unique=True, index=True)  # Ensure emails are unique
     created_at = Column(DateTime, default=datetime.utcnow)
     subscribed = Column(Boolean, default=True)  # To allow users to unsubscribe 
+
+
+
+class DjSocials(Base):
+    __tablename__ = "dj_socials"
+
+    id = Column(Integer, primary_key=True, index=True)
+    instagram = Column(String, nullable=True)
+    tiktok = Column(String, nullable=True)
+    spotify = Column(String, nullable=True)
+    soundcloud = Column(String, nullable=True)
+    youtube = Column(String, nullable=True)
+    apple_music = Column(String, nullable=True)
+
+class Dj(Base):
+    __tablename__ = "djs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    alias = Column(String, nullable=False)
+    profile_url = Column(String, nullable=False)
+    social_id = Column(Integer, ForeignKey("dj_socials.id"))
+    
+    socials = relationship("DjSocials")
