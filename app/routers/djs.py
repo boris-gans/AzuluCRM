@@ -19,11 +19,14 @@ async def create_dj(
     _: bool = Depends(dependencies.verify_admin)
 ):
     # Create socials first if provided
+    print(dj)
     socials = None
     if dj.socials:
         socials = models.DjSocials(**dj.socials.dict())
         db.add(socials)
         db.flush()  # Get the socials ID without committing
+    print(f"Dj: {dj}")
+    print(f"Socials: {socials}")
 
     # Create DJ with optional socials reference
     db_dj = models.Dj(
