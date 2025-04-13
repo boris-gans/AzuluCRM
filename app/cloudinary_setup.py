@@ -51,6 +51,7 @@ def upload_image(file, folder="event_posters"):
         dict: Contains the image URL and other upload information
     """
     try:
+        print(cloudinary.config)
         # Read the file content
         file_content = file.file.read()
         
