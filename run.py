@@ -7,9 +7,15 @@ from app.main import app  # Import the app object from app.main
 load_dotenv()
 
 if __name__ == "__main__":
+    port = os.getenv("PORT")
+    if port is not None and port.isdigit():
+        port = int(port)
+    else:
+        port = 8000
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=int(os.getenv("PORT", "8000")),
+        port=port,
         reload=True
     ) 
