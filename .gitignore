@@ -65,4 +65,4 @@ venv.bak/
 logs/
 *.log 
 
-*.env.example
+/*.example
