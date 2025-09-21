@@ -23,9 +23,15 @@ app = FastAPI(
 )
 
 # Configure CORS
+
+# new origins
+origins = [
+    "https://azulu-events.vercel.app",
+    "http://localhost:3000",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins in development
+    allow_origins=origins,  # Allows all origins in development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
