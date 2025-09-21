@@ -26,9 +26,14 @@ app = FastAPI(
 
 # new origins
 origins = [
-    "https://azulu-events.vercel.app",
+    "https://azulu-admin.vercel.app",
+    "https://admin.azuluevents.com",
+    "https://azulu.nl",
+    "https://www.azulu.nl",
+    "https://azulu-rouge.vercel.app",
     "http://localhost:3000",
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Allows all origins in development
