@@ -1,3 +1,4 @@
+import sqlalchemy
 from sqlalchemy import create_engine, exc, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -19,22 +20,20 @@ MYSQL_PORT = os.getenv("MYSQL_PORT", "")
 MYSQL_USER = os.getenv("MYSQL_USER", "")  # Default user, change as needed
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")  # Set your password through env variable
 MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Retry configuration
 MAX_RETRIES = 3
 RETRY_DELAY = 1  # seconds
 
 # Construct MySQL connection URL
-DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
+# DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
 # Create SQLAlchemy engine with connection pool
 engine = create_engine(
     DATABASE_URL,
-    pool_size=3,  # Number of permanent connections
-    max_overflow=0,  # Maximum number of connections that can be created beyond pool_size
-    pool_timeout=30,  # Seconds to wait before giving up on getting a connection
-    pool_recycle=3600,  # Recycle connections after one hour to avoid stale connections
-    pool_pre_ping=True  # Enable connection health checks
+    poolclass=sqlalchemy.pool.NullPool,
+    connect_args={"connect_timeout": 10}
 )
 
 # Create session factory
