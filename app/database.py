@@ -20,7 +20,7 @@ MYSQL_PORT = os.getenv("MYSQL_PORT", "")
 MYSQL_USER = os.getenv("MYSQL_USER", "")  # Default user, change as needed
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")  # Set your password through env variable
 MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "")
-DATABASE_URL = os.getenv("DATABASE_URL")
+# DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Retry configuration
 MAX_RETRIES = 3
@@ -29,11 +29,23 @@ RETRY_DELAY = 1  # seconds
 # Construct MySQL connection URL
 # DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./azulu.db")
+
+# If using Render with persistent disk, construct the path
+RENDER_DISK_PATH = os.getenv("RENDER_DISK_PATH")
+if RENDER_DISK_PATH:
+    DATABASE_URL = f"sqlite:///{RENDER_DISK_PATH}/azulu.db"
+
 # Create SQLAlchemy engine with connection pool
+# engine = create_engine(
+#     DATABASE_URL,
+#     poolclass=sqlalchemy.pool.NullPool,
+#     connect_args={"connect_timeout": 10}
+# )
+
 engine = create_engine(
-    DATABASE_URL,
-    poolclass=sqlalchemy.pool.NullPool,
-    connect_args={"connect_timeout": 10}
+    DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
 # Create session factory
