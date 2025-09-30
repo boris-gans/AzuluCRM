@@ -7,7 +7,8 @@ from sqlalchemy import pool
 from sqlalchemy.engine import make_url
 
 from alembic import context
-from app.database import Base, DATABASE_URL
+from app.database import Base
+import app.models  # noqa: F401 ensures metadata is populated
 
 
 load_dotenv()
@@ -19,7 +20,33 @@ if config.config_file_name is not None:
 
 def _determine_database_url() -> str:
     """Resolve the database URL with Alembic-specific overrides."""
-    return os.getenv("ALEMBIC_DATABASE_URL", DATABASE_URL)
+    explicit = os.getenv("ALEMBIC_DATABASE_URL")
+    if explicit:
+        return explicit
+
+    render_disk_path = os.getenv("RENDER_DISK_PATH")
+    if render_disk_path:
+        return f"sqlite:///{render_disk_path}/azulu.db"
+
+    env_database_url = os.getenv("DATABASE_URL")
+    if env_database_url:
+        return env_database_url
+
+    mysql_host = os.getenv("MYSQL_HOST")
+    mysql_db = os.getenv("MYSQL_DATABASE")
+    if mysql_host and mysql_db:
+        mysql_port = os.getenv("MYSQL_PORT", "3306")
+        mysql_user = os.getenv("MYSQL_USER", "")
+        mysql_password = os.getenv("MYSQL_PASSWORD", "")
+
+        auth = mysql_user or ""
+        if mysql_password:
+            auth = f"{auth}:{mysql_password}" if auth else f":{mysql_password}"
+
+        auth_section = f"{auth}@" if auth else ""
+        return f"mysql+pymysql://{auth_section}{mysql_host}:{mysql_port}/{mysql_db}"
+
+    return "sqlite:///./azulu.db"
 
 
 def _prepare_sqlite_directory(url: str) -> None:
