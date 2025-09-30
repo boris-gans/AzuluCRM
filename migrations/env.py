@@ -8,7 +8,7 @@ from sqlalchemy.engine import make_url
 
 from alembic import context
 from app.database import Base
-import app.models  # noqa: F401 ensures metadata is populated
+from app.models import Event, Content, MailingListEntry, Dj, DjSocials, JSONList# noqa: F401 ensures metadata is populated
 
 
 load_dotenv()
