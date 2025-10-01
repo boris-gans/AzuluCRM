@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import logging
 
 from . import models, database, cloudinary_setup
+from database import Base, engine
 from .routers import events, content, mailing_list, djs
 from .dependencies import verify_admin
 
@@ -53,6 +54,7 @@ app.include_router(djs.router)
 @app.on_event("startup")
 async def startup_db_client():
     """Verify database connection on startup"""
+    Base.metadata.create_all(bind=engine)
     try:
         database.verify_database_connection()
         logger.info("Database connection verified successfully")
