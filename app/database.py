@@ -30,12 +30,13 @@ RETRY_DELAY = 1  # seconds
 # DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./azulu.db")
+# DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////var/data/azulu.db")
+DATABASE_URL = "sqlite:////var/data/azulu.db"
 
 # If using Render with persistent disk, construct the path
 RENDER_DISK_PATH = os.getenv("RENDER_DISK_PATH")
-if RENDER_DISK_PATH:
-    DATABASE_URL = f"sqlite:///{RENDER_DISK_PATH}/azulu.db"
+# if RENDER_DISK_PATH:
+#     DATABASE_URL = f"sqlite:///{RENDER_DISK_PATH}/azulu.db"
 
 # Create SQLAlchemy engine with connection pool
 # engine = create_engine(
