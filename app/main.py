@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import logging
 
 from . import models, database, cloudinary_setup
-from database import Base, engine
+from .database import Base, engine
 from .routers import events, content, mailing_list, djs
 from .dependencies import verify_admin
 
